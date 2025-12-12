@@ -1,0 +1,172 @@
+#include <stdio.h>
+
+int main() {
+    char map[8][15];
+    int pacX = 1, pacY = 1;
+    int ghostX = 13, ghostY = 6;
+    int score = 0;
+    int gameRunning = 1;
+    char move;
+    int i, j;
+    int newX, newY;
+    int dotsLeft;
+    
+    // Initialize the map
+    i = 0;
+    while (i < 8) {
+        j = 0;
+        while (j < 15) {
+            if (i == 0 || i == 7 || j == 0 || j == 14) {
+                map[i][j] = '#';
+            } else {
+                map[i][j] = '.';
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    
+    // Add some walls
+    map[2][5] = '#';
+    map[3][5] = '#';
+    map[4][5] = '#';
+    map[2][9] = '#';
+    map[3][9] = '#';
+    map[4][9] = '#';
+    
+    printf("=== PACMAN GAME ===\n");
+    printf("Collect dots (.) and avoid ghost (G)\n");
+    printf("w=up, s=down, a=left, d=right, x=exit\n");
+    printf("Press Enter to start...\n");
+    getchar();
+    
+    // Main game loop
+    while (gameRunning == 1) {
+        
+        // Clear screen
+        i = 0;
+        while (i < 30) {
+            printf("\n");
+            i = i + 1;
+        }
+        
+        // Draw map
+        printf("=== PACMAN GAME ===\n\n");
+        i = 0;
+        while (i < 8) {
+            j = 0;
+            while (j < 15) {
+                if (i == pacY && j == pacX) {
+                    printf("C ");
+                } else if (i == ghostY && j == ghostX) {
+                    printf("G ");
+                } else {
+                    printf("%c ", map[i][j]);
+                }
+                j = j + 1;
+            }
+            printf("\n");
+            i = i + 1;
+        }
+        
+        printf("\nScore: %d\n", score);
+        printf("Enter move: ");
+        scanf(" %c", &move);
+        
+        // Move Pacman
+        newX = pacX;
+        newY = pacY;
+        
+        if (move == 'w' || move == 'W') {
+            newY = newY - 1;
+        }
+        if (move == 's' || move == 'S') {
+            newY = newY + 1;
+        }
+        if (move == 'a' || move == 'A') {
+            newX = newX - 1;
+        }
+        if (move == 'd' || move == 'D') {
+            newX = newX + 1;
+        }
+        if (move == 'x' || move == 'X') {
+            gameRunning = 0;
+        }
+        
+        // Check if new position is valid
+        if (map[newY][newX] != '#') {
+            pacX = newX;
+            pacY = newY;
+            
+            // Eat dot
+            if (map[pacY][pacX] == '.') {
+                map[pacY][pacX] = ' ';
+                score = score + 10;
+            }
+        }
+        
+        // Move ghost towards Pacman
+        newX = ghostX;
+        newY = ghostY;
+        
+        if (pacX > ghostX) {
+            newX = newX + 1;
+        }
+        if (pacX < ghostX) {
+            newX = newX - 1;
+        }
+        if (pacY > ghostY) {
+            newY = newY + 1;
+        }
+        if (pacY < ghostY) {
+            newY = newY - 1;
+        }
+        
+        if (map[newY][newX] != '#') {
+            ghostX = newX;
+            ghostY = newY;
+        }
+        
+        // Check collision with ghost
+        if (pacX == ghostX && pacY == ghostY) {
+            i = 0;
+            while (i < 30) {
+                printf("\n");
+                i = i + 1;
+            }
+            printf("GAME OVER! Ghost caught you!\n");
+            printf("Final Score: %d\n", score);
+            gameRunning = 0;
+        }
+        
+        // Count remaining dots
+        dotsLeft = 0;
+        i = 0;
+        while (i < 8) {
+            j = 0;
+            while (j < 15) {
+                if (map[i][j] == '.') {
+                    dotsLeft = dotsLeft + 1;
+                }
+                j = j + 1;
+            }
+            i = i + 1;
+        }
+        
+        // Check win condition
+        if (dotsLeft == 0) {
+            i = 0;
+            while (i < 30) {
+                printf("\n");
+                i = i + 1;
+            }
+            printf("YOU WIN!\n");
+            printf("Final Score: %d\n", score);
+            gameRunning = 0;
+        }
+    }
+    
+    printf("\nThanks for playing!\n");
+    
+    return 0;
+}
